@@ -1,0 +1,64 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/razorpay/create-order"
+  to = "/.netlify/functions/create-order"
+  status = 200
+
+[[redirects]]
+  from = "/api/razorpay/verify-payment"
+  to = "/.netlify/functions/verify-payment"
+  status = 200
+
+[[redirects]]
+  from = "/api/razorpay/record-failed-payment"
+  to = "/.netlify/functions/record-failed-payment"
+  status = 200
+
+[[redirects]]
+  from = "/api/razorpay/refund"
+  to = "/.netlify/functions/refund"
+  status = 200
+
+[[redirects]]
+  from = "/api/razorpay/test-connection"
+  to = "/.netlify/functions/test-connection"
+  status = 200
+
+[[redirects]]
+  from = "/api/razorpay/save-settings"
+  to = "/.netlify/functions/save-settings"
+  status = 200
+
+[[redirects]]
+  from = "/api/razorpay/webhook"
+  to = "/.netlify/functions/webhook"
+  status = 200
+
+[[redirects]]
+  from = "/api/create-order"
+  to = "/.netlify/functions/create-order"
+  status = 200
+
+[[redirects]]
+  from = "/api/verify-payment"
+  to = "/.netlify/functions/verify-payment"
+  status = 200
+
+# Proxy wildcard fallback for other functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# React Router single-page app hosting fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

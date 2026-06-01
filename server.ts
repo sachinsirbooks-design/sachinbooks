@@ -147,6 +147,22 @@ async function startServer() {
     req.url = "/api/razorpay/verify-payment";
     next();
   });
+  app.post("/api/record-failed-payment", async (req, res, next) => {
+    req.url = "/api/razorpay/record-failed-payment";
+    next();
+  });
+  app.post("/api/refund", async (req, res, next) => {
+    req.url = "/api/razorpay/refund";
+    next();
+  });
+  app.post("/api/test-connection", async (req, res, next) => {
+    req.url = "/api/razorpay/test-connection";
+    next();
+  });
+  app.post("/api/save-settings", async (req, res, next) => {
+    req.url = "/api/razorpay/save-settings";
+    next();
+  });
 
   // Create Razorpay Order
   app.post("/api/razorpay/create-order", async (req, res) => {
@@ -305,44 +321,7 @@ async function startServer() {
     }
   });
 
-  // Mock Verify for Sandbox payment simulation testing
-  app.post("/api/razorpay/mock-verify", async (req, res) => {
-    try {
-      const { orderId } = req.body;
-      if (!orderId) {
-        return res.status(400).json({ error: "Missing required orderId property for simulation." });
-      }
 
-      const orderRef = doc(db, "orders", orderId);
-      const orderSnap = await getDoc(orderRef);
-      let orderData: any = null;
-      if (orderSnap.exists()) {
-        orderData = orderSnap.data();
-      }
-
-      await updateDoc(orderRef, {
-        status: "processing",
-        paymentId: `MOCK-PAY-${Date.now()}`,
-        paymentOrderId: `MOCK-ORD-${Date.now()}`,
-        paymentStatus: "success"
-      });
-
-      // Save success database records
-      await addDoc(collection(db, "payments"), {
-        paymentId: `MOCK-PAY-${Date.now()}`,
-        orderId: orderId,
-        amount: orderData?.total || 0,
-        userEmail: orderData?.address?.fullName ? `${orderData.address.fullName} (${orderData.address?.phone || ""})` : "test@test.com",
-        userId: orderData?.userId || null,
-        timestamp: new Date().toISOString()
-      });
-
-      res.json({ status: "success" });
-    } catch (err: any) {
-      console.error("Mock Verification Error:", err);
-      res.status(500).json({ error: err.message || "Failed to simulate sandbox verification" });
-    }
-  });
 
   // Record Failed Payment (Popup dismissed or manual fail)
   app.post("/api/razorpay/record-failed-payment", async (req, res) => {
