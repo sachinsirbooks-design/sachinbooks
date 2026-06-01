@@ -1,0 +1,179 @@
+{
+  "entities": {
+    "Book": {
+      "title": "Book",
+      "description": "Represents a book in the store.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "price": { "type": "number" },
+        "discount": { "type": "number" },
+        "finalPrice": { "type": "number" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "weight": { "type": "number" },
+        "stockQuantity": { "type": "number" },
+        "status": { "type": "string", "enum": ["In stock", "Out of stock"] },
+        "isSachinSirBook": { "type": "boolean" },
+        "sampleFileUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "category", "price", "finalPrice", "imageUrl", "stockQuantity", "status"]
+    },
+    "AppSettings": {
+      "title": "AppSettings",
+      "description": "Global site configuration.",
+      "type": "object",
+      "properties": {
+        "logoUrl": { "type": "string" },
+        "socialLinks": { "type": "object" },
+        "seo": { "type": "object" },
+        "founder": { "type": "object" },
+        "whatsappChatbot": { "type": "object" }
+      }
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Book categories and exam bento pathways.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "type": { "type": "string", "enum": ["exam", "subject", "special", "practice", "language"] },
+        "description": { "type": "string" },
+        "order": { "type": "number" },
+        "icon": { "type": "string" }
+      },
+      "required": ["name", "slug", "type"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer orders.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "items": { "type": "array" },
+        "total": { "type": "number" },
+        "weight": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "processing", "shipped", "delivered", "cancelled"] },
+        "address": { "type": "object" },
+        "paymentId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "items", "total", "status", "address"]
+    },
+    "User": {
+      "title": "User",
+      "description": "User profiles.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "isAdmin": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "name"]
+    },
+    "Banner": {
+      "title": "Banner",
+      "description": "Hero section banners.",
+      "type": "object",
+      "properties": {
+        "imageUrl": { "type": "string" },
+        "title": { "type": "string" },
+        "link": { "type": "string" },
+        "active": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["imageUrl", "active"]
+    },
+    "Lead": {
+      "title": "Lead",
+      "description": "Information provided by users when joining the academy circle.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "email", "phone"]
+    },
+    "Coupon": {
+      "title": "Coupon",
+      "description": "Promotional or discount coupons.",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "discountType": { "type": "string", "enum": ["percentage", "fixed"] },
+        "discountValue": { "type": "number" },
+        "minCartValue": { "type": "number" },
+        "isPublic": { "type": "boolean" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["code", "discountType", "discountValue", "minCartValue", "isPublic", "active"]
+    },
+    "VisualTile": {
+      "title": "VisualTile",
+      "description": "Visual categories / exam paths featured on the home page.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "emoji": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["name", "slug", "emoji", "order"]
+    }
+  },
+  "firestore": {
+    "books": {
+      "schema": "Book",
+      "description": "Collection of books available for sale."
+    },
+    "categories": {
+      "schema": "Category",
+      "description": "Collection of book categories."
+    },
+    "orders": {
+      "schema": "Order",
+      "description": "Collection of customer orders."
+    },
+    "users": {
+      "schema": "User",
+      "description": "Collection of user profiles."
+    },
+    "banners": {
+      "schema": "Banner",
+      "description": "Collection of hero banners."
+    },
+    "admins": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" }
+        }
+      },
+      "description": "Collection of admin IDs for RBAC."
+    },
+    "leads": {
+      "schema": "Lead",
+      "description": "Collection of marketing leads from the homepage."
+    },
+    "settings": {
+      "schema": "AppSettings",
+      "description": "Global site settings."
+    },
+    "coupons": {
+      "schema": "Coupon",
+      "description": "Promo coupon directory."
+    },
+    "visual_tiles": {
+      "schema": "VisualTile",
+      "description": "Featured home category navigation/tiles."
+    }
+  }
+}

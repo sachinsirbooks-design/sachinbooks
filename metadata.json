@@ -1,0 +1,8 @@
+{
+  "name": "Sachin Sir Books",
+  "description": "The official bookstore of Sachin Dhawale Academy. Premium resources for Maths, Reasoning, and CSAT preparation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

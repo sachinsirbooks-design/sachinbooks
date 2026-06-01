@@ -1,0 +1,92 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMasterAdmin() {
+      return signedIn() &&
+        (
+          request.auth.token.email.lower() == "sachinsirbooks@gmail.com" ||
+          request.auth.token.email.lower() == "sachindhawadepublication@gmail.com"
+        );
+    }
+
+    function isAdmin() {
+      return isMasterAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if signedIn() && request.auth.uid == userId;
+    }
+
+    match /orders/{orderId} {
+      allow read: if true;
+      allow write, create: if true;
+    }
+
+    match /leads/{leadId} {
+      allow read, write, create: if true;
+    }
+
+    match /payments/{paymentId} {
+      allow read: if true;
+      allow write, create: if true;
+    }
+
+    match /failedPayments/{failedId} {
+      allow read: if true;
+      allow write, create: if true;
+    }
+
+    match /invoices/{invoiceId} {
+      allow read: if true;
+      allow write, create: if true;
+    }
+
+    match /paymentLogs/{logId} {
+      allow read: if true;
+      allow write, create: if true;
+    }
+
+    match /payment_logs/{logId} {
+      allow read: if true;
+      allow write, create: if true;
+    }
+
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /books/{bookId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /visual_tiles/{tileId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Default safe fallback
+    match /{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
