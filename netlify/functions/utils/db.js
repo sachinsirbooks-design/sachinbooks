@@ -1,57 +1,29 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import crypto from "crypto";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 
-// Get standard ESM __dirname and __filename equivalents
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Fallback to literal configuration derived from the local firebase-applet-config.json
+const firebaseConfigEnv = {
+  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyCWxu6wn0USdDt-hQr6ZWuUlS7aoadxjbU",
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || "gen-lang-client-0637806090.firebaseapp.com",
+  projectId: process.env.FIREBASE_PROJECT_ID || "gen-lang-client-0637806090",
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "gen-lang-client-0637806090.firebasestorage.app",
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "980161271823",
+  appId: process.env.FIREBASE_APP_ID || "1:980161271823:web:0ab76f633b1062bc29ab7a",
+  firestoreDatabaseId: process.env.FIREBASE_DATABASE_ID || "ai-studio-9469fb85-ed3b-4f44-8f63-f3f904a6b0d8"
+};
 
-// Resolve firebase-applet-config.json path dynamically across fallback locations
-let rawConfig = "";
-const pathsToTry = [
-  path.resolve(process.cwd(), "firebase-applet-config.json"),
-  path.join(__dirname, "../../../firebase-applet-config.json"),
-  path.join(__dirname, "../../firebase-applet-config.json"),
-  path.join(__dirname, "firebase-applet-config.json"),
-];
-
-for (const p of pathsToTry) {
+let firebaseConfig = firebaseConfigEnv;
+if (process.env.FIREBASE_CONFIG) {
   try {
-    if (fs.existsSync(p)) {
-      rawConfig = fs.readFileSync(p, "utf-8");
-      break;
-    }
+    firebaseConfig = JSON.parse(process.env.FIREBASE_CONFIG);
   } catch (e) {
-    // Try the next path search path
+    console.error("Failed to parse FIREBASE_CONFIG environment variable:", e);
   }
 }
 
-if (!rawConfig) {
-  // Try directly searching process.env for standard firebase-applet-config items
-  const firebaseConfigEnv = {
-    apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.FIREBASE_APP_ID,
-    firestoreDatabaseId: process.env.FIREBASE_DATABASE_ID || "(default)"
-  };
-
-  if (firebaseConfigEnv.apiKey && firebaseConfigEnv.projectId) {
-    rawConfig = JSON.stringify(firebaseConfigEnv);
-  } else {
-    // If not found in env, let's look for a generic firebase-applet-config inside of current directory or default placeholder
-    console.error("CRITICAL: firebase-applet-config.json not found and no environment variables available.");
-  }
-}
-
-const firebaseConfig = rawConfig ? JSON.parse(rawConfig) : null;
-const firebaseApp = firebaseConfig ? initializeApp(firebaseConfig) : null;
-export const db = firebaseConfig ? getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId) : null;
+const firebaseApp = initializeApp(firebaseConfig);
+export const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId || "(default)");
 
 // Cryptographic Encryption Helpers
 const ENCRYPTION_KEY_RAW = process.env.RAZORPAY_ENCRYPTION_KEY || "sachinsir_razorpay_default_secure_key_129#";

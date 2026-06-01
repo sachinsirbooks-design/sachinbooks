@@ -40,7 +40,7 @@ export default function Checkout() {
     applyCoupon,
     removeCoupon
   } = useCart();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { settings } = useSettings();
   const navigate = useNavigate();
 
@@ -605,68 +605,74 @@ export default function Checkout() {
                       
                       <p className="text-[10px] text-neutral-500 leading-relaxed">
                         {settings?.razorpay?.keyId 
-                          ? `🔑 SECURE PAYMENT ACTIVE: Identified registered Razorpay Credentials (Key ID: "${settings.razorpay.keyId}"). Clicking the button below will securely launch the authentic Razorpay checkout gateway.` 
-                          : "⚠️ No standard credentials detected in site settings. Click below to enter your Razorpay test or live Key ID & Secret to receive standard online student payments."}
+                          ? isAdmin 
+                            ? `🔑 SECURE PAYMENT ACTIVE: Identified registered Razorpay Credentials (Key ID: "${settings.razorpay.keyId}"). Clicking the button below will securely launch the authentic Razorpay checkout gateway.` 
+                            : "🔑 SECURE PAYMENT ACTIVE: Clicking the button below will securely launch the authentic Razorpay checkout gateway."
+                          : isAdmin 
+                            ? "⚠️ No standard credentials detected in site settings. Click below to enter your Razorpay test or live Key ID & Secret to receive standard online student payments."
+                            : "💳 Online Payment is ready. Clicking the button below will securely process your order."}
                       </p>
 
-                      <div className="pt-2 border-t border-neutral-200/50">
-                        {!showConfigKeys ? (
-                          <button
-                            type="button"
-                            onClick={() => setShowConfigKeys(true)}
-                            className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline transition-all flex items-center gap-1.5 cursor-pointer"
-                          >
-                            ⚙️ {settings?.razorpay?.keyId ? 'Update Credentials / Reconfigure API Keys' : 'Configure Razorpay API Keys Directly'}
-                          </button>
-                        ) : (
-                          <div className="space-y-4 bg-white p-4 rounded-xl border border-neutral-150 mt-2">
-                            <div className="flex justify-between items-center">
-                              <h4 className="text-[10px] font-black uppercase tracking-wider text-neutral-800">⚙️ Live API Key Setup</h4>
-                              <button
-                                type="button"
-                                onClick={() => setShowConfigKeys(false)}
-                                className="text-neutral-400 hover:text-rose-600 font-bold text-xs"
-                              >
-                                Close
-                              </button>
+                      {isAdmin && (
+                        <div className="pt-2 border-t border-neutral-200/50">
+                          {!showConfigKeys ? (
+                            <button
+                              type="button"
+                              onClick={() => setShowConfigKeys(true)}
+                              className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline transition-all flex items-center gap-1.5 cursor-pointer"
+                            >
+                              ⚙️ {settings?.razorpay?.keyId ? 'Update Credentials / Reconfigure API Keys' : 'Configure Razorpay API Keys Directly'}
+                            </button>
+                          ) : (
+                            <div className="space-y-4 bg-white p-4 rounded-xl border border-neutral-150 mt-2">
+                              <div className="flex justify-between items-center">
+                                <h4 className="text-[10px] font-black uppercase tracking-wider text-neutral-800">⚙️ Live API Key Setup</h4>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowConfigKeys(false)}
+                                  className="text-neutral-400 hover:text-rose-600 font-bold text-xs"
+                                >
+                                  Close
+                                </button>
+                              </div>
+                              <form onSubmit={handleSaveQuickKeys} className="space-y-3">
+                                <div>
+                                  <label className="block text-[9px] font-black uppercase tracking-wider text-neutral-400 mb-1">Razorpay Key ID</label>
+                                  <input
+                                    type="text"
+                                    required
+                                    value={quickKeyId}
+                                    onChange={(e) => setQuickKeyId(e.target.value)}
+                                    placeholder="rzp_live_... or rzp_test_..."
+                                    className="w-full text-xs font-bold bg-neutral-50 px-3.5 py-2.5 rounded-lg border border-neutral-200 outline-none focus:border-blue-500"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[9px] font-black uppercase tracking-wider text-neutral-400 mb-1">Key Secret</label>
+                                  <input
+                                    type="password"
+                                    required
+                                    value={quickKeySecret}
+                                    onChange={(e) => setQuickKeySecret(e.target.value)}
+                                    placeholder="your_razorpay_key_secret"
+                                    className="w-full text-xs font-bold bg-neutral-50 px-3.5 py-2.5 rounded-lg border border-neutral-200 outline-none focus:border-blue-500"
+                                  />
+                                </div>
+                                <div className="text-[9px] text-neutral-400 leading-tight">
+                                  💡 Stored securely using standard server-side encryption. You can get yours from <strong>dashboard.razorpay.com</strong> under Settings → API Keys.
+                                </div>
+                                <button
+                                  type="submit"
+                                  disabled={isSavingQuickKeys}
+                                  className="w-full py-2.5 bg-blue-600 text-white rounded-lg text-xs font-black uppercase tracking-wider hover:bg-blue-700 active:scale-98 transition-all cursor-pointer disabled:opacity-50"
+                                >
+                                  {isSavingQuickKeys ? 'Saving to Database...' : '⚡ Save & Apply Keys'}
+                                </button>
+                              </form>
                             </div>
-                            <form onSubmit={handleSaveQuickKeys} className="space-y-3">
-                              <div>
-                                <label className="block text-[9px] font-black uppercase tracking-wider text-neutral-400 mb-1">Razorpay Key ID</label>
-                                <input
-                                  type="text"
-                                  required
-                                  value={quickKeyId}
-                                  onChange={(e) => setQuickKeyId(e.target.value)}
-                                  placeholder="rzp_live_... or rzp_test_..."
-                                  className="w-full text-xs font-bold bg-neutral-50 px-3.5 py-2.5 rounded-lg border border-neutral-200 outline-none focus:border-blue-500"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[9px] font-black uppercase tracking-wider text-neutral-400 mb-1">Key Secret</label>
-                                <input
-                                  type="password"
-                                  required
-                                  value={quickKeySecret}
-                                  onChange={(e) => setQuickKeySecret(e.target.value)}
-                                  placeholder="your_razorpay_key_secret"
-                                  className="w-full text-xs font-bold bg-neutral-50 px-3.5 py-2.5 rounded-lg border border-neutral-200 outline-none focus:border-blue-500"
-                                />
-                              </div>
-                              <div className="text-[9px] text-neutral-400 leading-tight">
-                                💡 Stored securely using standard server-side encryption. You can get yours from <strong>dashboard.razorpay.com</strong> under Settings → API Keys.
-                              </div>
-                              <button
-                                type="submit"
-                                disabled={isSavingQuickKeys}
-                                className="w-full py-2.5 bg-blue-600 text-white rounded-lg text-xs font-black uppercase tracking-wider hover:bg-blue-700 active:scale-98 transition-all cursor-pointer disabled:opacity-50"
-                              >
-                                {isSavingQuickKeys ? 'Saving to Database...' : '⚡ Save & Apply Keys'}
-                              </button>
-                            </form>
-                          </div>
-                        )}
-                      </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
 
